@@ -5,9 +5,10 @@ FILE=$1
 X=$2
 Y=$3
 OUT=$4
+OTHER=$5
 
-if test "$#" -ne 4; then
-    echo "Usage: $0 <file> <x-label> <y-label> <output.png>"
+if test "$#" -lt 4; then
+    echo "Usage: $0 <file> <x-label> <y-label> <output.png> [other]"
     exit 1
 fi
 
@@ -20,5 +21,6 @@ gnuplot -p -e "                                                            \
     set term png;                                                          \
     set output '${OUT}';                                                   \
     set terminal png size 1920,1080;                                       \
+    ${OTHER}                                                               \
     plot '${FILE}' with linespoints pointtype 7 pointsize 0.5;             \
 "

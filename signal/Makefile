@@ -1,6 +1,10 @@
-TARGETS = lab1-gen lab1-on lab2-autocorr lab2-corr
+# Maybe it isn't the best makefile that you have ever seen,
+# but it does its job well. So, who cares? ¯\_(ツ)_/¯
 
-all: out/signal.png out/on.png out/autocorr.png out/corr.png
+TARGETS = lab1-gen lab1-on lab2-autocorr lab2-corr lab2-on
+DATA = gen.dat values.dat on.dat autocorr.dat corr.dat corr-on.dat
+
+all: out/signal.png out/on.png out/autocorr.png out/corr.png out/corr-on.png
 
 # Build main binaries
 $(TARGETS): src/*
@@ -27,6 +31,10 @@ out/corr.png: lab2-corr
 	target/release/lab2-corr > out/corr.dat
 	./plot.sh out/corr.dat 'tau' 'correlation' $@
 
+# Plot O(n) of correlation calculating
+out/corr-on.png: lab2-on
+	target/release/lab2-on > out/corr-on.dat
+	./plot.sh out/corr-on.dat 'n' 'O(n)' $@ 'set logscale x 10;'
 
 clean:
 	rm -rf build target
