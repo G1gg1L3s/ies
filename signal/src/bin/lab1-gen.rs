@@ -1,4 +1,4 @@
-use signal::gen_signal;
+use signal::{gen_signal, stats};
 
 const HARMONICS: usize = 12;
 const FREQUENCY: usize = 900;
@@ -12,15 +12,7 @@ fn main() {
         let t = t as f64 * DT;
         println!("{}\t{}", t, x);
     }
-    let avg = res.iter().sum::<f64>() / res.len() as f64;
-    let disp = res
-        .iter()
-        .map(|x| {
-            let x = avg - x;
-            x * x
-        })
-        .sum::<f64>()
-        / (res.len() - 1) as f64;
+    let (avg, disp) = stats(&res);
     eprintln!("average: {}", avg);
     eprintln!("dispersion: {}", disp);
 }
