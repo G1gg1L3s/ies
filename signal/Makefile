@@ -1,5 +1,7 @@
 TARGETS = lab1-gen lab1-on
 
+all: out/signal.png out/on.png
+
 # Build main binaries
 $(TARGETS): src/*
 	cargo build --release --bin $@
