@@ -151,6 +151,27 @@ class Diophantine extends Phenotype {
   }
 }
 
+int testDuration(int order, int tests) {
+  final int eqSize = 10;
+
+  int sum = 0;
+  for (var i = 0; i < tests; i++) {
+    var rng = Random();
+    var coeffs = List<int>.generate(eqSize, (index) => index);
+    var eqaution = DiophantineEquation(coeffs, eqSize);
+    var start = List<Diophantine>.generate(order, (index) {
+      var solutions = List<int>.generate(eqSize, (index) => rng.nextInt(order));
+      return Diophantine(eqaution, solutions);
+    });
+    var simulation = Simulator(start, maxIters: 1000);
+    simulation.run();
+    sum += simulation.iters;
+  }
+
+  sum ~/= tests;
+  return sum;
+}
+
 // void main() {
 //   var rng = Random();
 //   var coeffs = List<int>.generate(10, (index) => index);

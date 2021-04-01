@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lab3_3/genetic.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 void main() {
   runApp(MyApp());
@@ -97,6 +98,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Measures',
+        child: Icon(Icons.show_chart_sharp),
+        onPressed: () => {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ChartPage.init()))
+        },
+      ),
     );
   }
 
@@ -117,4 +126,54 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class ChartPage extends StatelessWidget {
+  final List<Point> measures;
+
+  ChartPage(this.measures);
+
+  factory ChartPage.init() {
+    var points = <Point>[];
+    for (int i = 1; i < 50; i++) {
+      print("Processing $i");
+      points.add(Point(i, testDuration(i, 100)));
+    }
+    return ChartPage(points);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Measures'),
+        ),
+        body: Chart(measures));
+  }
+}
+
+class Chart extends StatelessWidget {
+  final List<Point> points;
+
+  Chart(this.points);
+
+  @override
+  Widget build(BuildContext context) {
+    var serial = charts.Series<Point, int>(
+      id: 'points',
+      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      domainFn: (Point p, _) => p.x,
+      measureFn: (Point p, _) => p.y,
+      data: points,
+    );
+    var series = [serial];
+    return new charts.LineChart(series, animate: false);
+  }
+}
+
+class Point {
+  int x;
+  int y;
+
+  Point(this.x, this.y);
 }
