@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab3_2/perceptron.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 void main() {
   runApp(MyApp());
@@ -126,6 +127,17 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Measures',
+        child: Icon(Icons.show_chart_sharp),
+        onPressed: () => {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            var sigmas = sigmaList.map((String x) => double.parse(x)).toList();
+            var it = int.parse(iters);
+            return ChartPage.init(it, p, sigmas, points);
+          }))
+        },
+      ),
     );
   }
 
@@ -153,4 +165,63 @@ Widget buildDropDown(List<String> list, String value, Function callback) {
       return DropdownMenuItem<String>(value: value, child: Text(value));
     }).toList(),
   );
+}
+
+class ChartPage extends StatelessWidget {
+  final List<ChartBar> measures;
+  static final int simulationNum = 100;
+
+  ChartPage(this.measures);
+
+  factory ChartPage.init(
+      int iters, double p, List<double> sigmas, List<Point> points) {
+    var chartPoints = <ChartBar>[];
+    for (var sigma in sigmas) {
+      int elapsed = 0;
+      for (int i = 0; i < simulationNum; i++) {
+        Stopwatch stopwatch = new Stopwatch()..start();
+        var network = Network(iters, p, sigma, points);
+        network.run();
+        elapsed += stopwatch.elapsed.inMicroseconds;
+      }
+
+      chartPoints.add(ChartBar(sigma, elapsed));
+    }
+    return ChartPage(chartPoints);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Measures'),
+        ),
+        body: Chart(measures));
+  }
+}
+
+class Chart extends StatelessWidget {
+  final List<ChartBar> points;
+
+  Chart(this.points);
+
+  @override
+  Widget build(BuildContext context) {
+    var serial = charts.Series<ChartBar, String>(
+      id: 'points',
+      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      domainFn: (ChartBar p, _) => "${p.sigma}",
+      measureFn: (ChartBar p, _) => p.value,
+      data: points,
+    );
+    var series = [serial];
+    return charts.BarChart(series, animate: true);
+  }
+}
+
+class ChartBar {
+  double sigma;
+  int value;
+
+  ChartBar(this.sigma, this.value);
 }
